@@ -107,6 +107,11 @@ class Task:
 try:
     with open('Tasks.dat', 'rb') as f:
         tasks = list(pickle.load(f))
+        if type(tasks[0]) == str and tasks[0].find('_____') == -1:
+            Sort = tasks[0]
+            tasks.pop(0)
+        else:
+            Sort = 'non'
 except EOFError:
     tasks = []  # No tasks in file
 
@@ -137,7 +142,7 @@ def completeTask(task):
 
 
 def sort(by):
-    global headingPoss, tasks
+    global headingPoss, tasks, Sort
     change = True
     sortable = True
     headings = True
@@ -207,15 +212,18 @@ def sort(by):
                 sortedArr.append(tasks[int(i[:slash-1])])
         if by in ['pri', 'non', 'due']:
             tasks = sortedArr
+            Sort = by
         else:
             print(f'Unable to sort by {by}')
     elif change:
+        Sort = by
         sortedArr = []
         for i in arr:
             slash = i.find('/')+1
             sortedArr.append(tasks[int(i[:slash-1])])
         tasks = sortedArr
     else:
+        Sort = by
         tasks = sortedArr
 
 
@@ -266,6 +274,8 @@ while run:
     global headingPoss
     print('----------------------------------------------------')
     printTasks()
+    if len(tasks) == 0:
+        print('All Tasks completed or hidden!')
     print('----------------------------------------------------')
     choice = input('Choice ->')[:3]
     choice = choice.lower()
@@ -281,6 +291,7 @@ while run:
         comp = False
         newTask = Task(sub, content, due, prio, comp)
         tasks.append(newTask)
+        sort(Sort)
 
     if choice in ['rem', 'pop', 'del']:
         try:
@@ -313,9 +324,16 @@ while run:
 
     if choice == 'cle':
         nice.draw()
+        sort('non')
+        for i in range(0, len(tasks)):
+            removeTask(i)
+        with open('Tasks.dat', 'wb') as f:
+            tasks.insert(0, Sort)
+            pickle.dump(tasks, f)
         input('press any key to end')
         exit()
 
 
 with open('Tasks.dat', 'wb') as f:
+    tasks.insert(0, Sort)
     pickle.dump(tasks, f)
