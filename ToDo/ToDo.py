@@ -191,7 +191,8 @@ def sort(by):
             arr.append(f'{i}/{diffDue}')
 
     if by == 'non':
-        sortable = False
+        by = 'non'
+        return None
 
     # implement check for mutiple digits
     if sortable:
@@ -254,7 +255,6 @@ def Help():
     finish,complete -> Marks a cetrian task as complete
     
     (Only the first 3 chariters are required)
-
     Sort:
     due
     none
@@ -291,7 +291,8 @@ while run:
         comp = False
         newTask = Task(sub, content, due, prio, comp)
         tasks.append(newTask)
-        sort(Sort)
+        if len(tasks)>1:
+            sort(Sort)
 
     if choice in ['rem', 'pop', 'del']:
         try:
